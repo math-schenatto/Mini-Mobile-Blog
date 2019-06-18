@@ -1,5 +1,6 @@
 package com.matheus.notesapp.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,12 +14,23 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.matheus.notesapp.Fragments.HomeFragment;
+import com.matheus.notesapp.Fragments.ProfileFragment;
+import com.matheus.notesapp.Fragments.SettingsFragment;
 import com.matheus.notesapp.R;
 
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    FirebaseAuth mAuth;
+    FirebaseUser currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +38,12 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //ini
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
+
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -41,6 +59,8 @@ public class HomeActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
+        updateNavHeader();
     }
 
     @Override
@@ -82,21 +102,43 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+            getSupportActionBar().setTitle("Home");
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new HomeFragment()).commit();
+        } else if (id == R.id.nav_profile) {
+            getSupportActionBar().setTitle("Perfil");
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ProfileFragment()).commit();
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_settings) {
+            getSupportActionBar().setTitle("Configurações");
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new SettingsFragment()).commit();
 
-        } else if (id == R.id.nav_tools) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_signout) {
+            FirebaseAuth.getInstance().signOut();
+            Intent loginActivity = new Intent(this, LoginActivity.class);
+            startActivity(loginActivity);
+            finish();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void updateNavHeader(){
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+        TextView navUsername = headerView.findViewById(R.id.nav_username);
+        TextView navUserMai = headerView.findViewById(R.id.nav_user_mail);
+        ImageView navUserPhot = headerView.findViewById(R.id.nav_user_photo);
+
+        navUserMai.setText(currentUser.getEmail());
+        navUsername.setText(currentUser.getDisplayName());
+
+        // agora vamos carregar a foto do usuário
+        // importae a biblioteca
+        Glide.with(this).load(currentUser.getPhotoUrl()).into(navUserPhot);
+
+
     }
 }
