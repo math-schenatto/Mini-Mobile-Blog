@@ -28,6 +28,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.9'
     //firebase Auth
     implementation 'com.google.firebase:firebase-auth:16.1.0'
+    //firebase Database
+    implementation 'com.google.firebase:firebase-database:16.1.0'
     //firebase Storage
     implementation 'com.google.firebase:firebase-storage:16.1.0'
     // glide library
