@@ -1,19 +1,29 @@
 package com.matheus.notesapp.Activities;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +35,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -47,19 +58,31 @@ import com.matheus.notesapp.Fragments.SettingsFragment;
 import com.matheus.notesapp.Models.Post;
 import com.matheus.notesapp.R;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static final int REQUEST_IMAGE_CAPTURE = 111;
 
-    private static final int PReqCode = 2;
+    private File arquivoFoto = null;
     private static final int REQUESCODE = 2;
+    private static final int GALLERY = 1;
+    private static final int CAMERA = 3;
     private Uri pickedImgUri = null;
+
     FirebaseAuth mAuth;
     FirebaseUser currentUser;
     Dialog popAddPost;
     ImageView popupUserImage, popupPostImage, popupAddBtn;
     TextView popupTitle, popupDescription;
     ProgressBar popupClickProgress;
+    FloatingActionButton btnGallery, btnCam;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,14 +90,36 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUESCODE);
+            }
+        }
+        // Pede permissão para escrever arquivos no dispositivo
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUESCODE);
+            }
+        }
         //ini
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
 
         // ini pop
         iniPopup();
-        setupPopupImageClick();
+        setupButtons();
 
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -96,34 +141,106 @@ public class HomeActivity extends AppCompatActivity
 
         // set the home fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.container, new HomeFragment()).commit();
+
     }
 
-    private void setupPopupImageClick(){
-        popupPostImage.setOnClickListener(new View.OnClickListener() {
+    private void setupButtons() {
+        btnGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // aqui, temos que abrir a galeria
-                checkAndRequestForPermission();
+
+                GalleryPermissions();
+
+            }
+        });
+        btnCam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                CamPermissions();
 
             }
         });
     }
 
-    private void checkAndRequestForPermission() {
+    private void GalleryPermissions() {
 
-        if(ContextCompat.checkSelfPermission(HomeActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                HomeActivity.this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-            if(ActivityCompat.shouldShowRequestPermissionRationale(HomeActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)){
-                Toast.makeText(HomeActivity.this, "Por favor, aceite as permissões", Toast.LENGTH_SHORT).show();
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    HomeActivity.this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+                Toast.makeText(HomeActivity.this,
+                        "Por favor, aceite as permissões",
+                        Toast.LENGTH_SHORT).show();
+
             } else {
-                ActivityCompat.requestPermissions(HomeActivity.this,
+                ActivityCompat.requestPermissions(
+                        HomeActivity.this,
                         new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        PReqCode);
+                        REQUESCODE);
             }
         } else {
             openGallery();
         }
+
+    }
+
+    private void CamPermissions() {
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUESCODE);
+            }
+        }
+        LaunchCamera();
+    }
+
+    public void LaunchCamera() {
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Log.d("LaunchCamera!!!!", "vai criar arquivo") ;
+
+        // cria um arquivo para salvar a foto
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
+
+
+
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_Hhmmss",
+                                                        Locale.ENGLISH
+                                                        ).format(new Date());
+                File pasta = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES);
+                String filename = pasta.getPath() + File.separator + "JPG_" + timeStamp + ".jpg";
+                File arquivoFoto = new File(filename);
+            try {
+                arquivoFoto.createNewFile();
+            } catch (IOException ex) {
+
+            }
+
+
+                pickedImgUri = FileProvider.getUriForFile(getBaseContext(),
+                    getBaseContext().getApplicationContext().getPackageName() +
+                            ".provider", arquivoFoto);
+//                pickedImgUri = Uri.fromFile(arquivoFoto);
+                Log.d("pickedImgUri", pickedImgUri.getPath()) ;
+
+//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, pickedImgUri); // todo se eu passo trava e nao da erro
+
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+
 
     }
 
@@ -132,22 +249,41 @@ public class HomeActivity extends AppCompatActivity
 
         Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
         galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent,REQUESCODE);
+        startActivityForResult(galleryIntent, GALLERY);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        Log.d("onActivityResult ", "entrou") ;
+
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK && requestCode == REQUESCODE && data != null){
-            // the user has successfully picked an image
-            //we nees to save
+        Log.d("requestCode", Integer.toString(requestCode));
+        Log.d("resultCode", Integer.toString(resultCode));
+
+        if (resultCode == RESULT_OK && requestCode == GALLERY && data != null) {
             pickedImgUri = data.getData();
             popupPostImage.setImageURI(pickedImgUri);
+            Log.d("onActivityResult - GALLERY - pickedImgUri", pickedImgUri.getPath());
 
         }
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            popupPostImage.setImageBitmap(imageBitmap);
+            // todo tentar colocar direto a uri
+            sendBroadcast(new Intent(
+                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                    pickedImgUri)
+            );
+
+        }
+
     }
 
-    public void iniPopup(){
+
+
+    public void iniPopup() {
         popAddPost = new Dialog(this);
         popAddPost.setContentView(R.layout.popup_add_post);
         popAddPost.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -157,6 +293,8 @@ public class HomeActivity extends AppCompatActivity
         // ini popup widgets
         popupUserImage = popAddPost.findViewById(R.id.popup_user_image);
         popupPostImage = popAddPost.findViewById(R.id.popup_img);
+        btnGallery = popAddPost.findViewById(R.id.btn_gallery);
+        btnCam = popAddPost.findViewById(R.id.btn_cam);
         popupTitle = popAddPost.findViewById(R.id.popup_title);
         popupDescription = popAddPost.findViewById(R.id.popup_description);
         popupAddBtn = popAddPost.findViewById(R.id.popup_add);
@@ -166,7 +304,6 @@ public class HomeActivity extends AppCompatActivity
         Glide.with(HomeActivity.this).load(currentUser.getPhotoUrl()).into(popupUserImage);
 
         //add post click listener
-
         popupAddBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -219,7 +356,7 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    private void addPost(Post post){
+    private void addPost(Post post) {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Posts").push();
@@ -242,7 +379,7 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
-    private void showMessage(String message){
+    private void showMessage(String message) {
         Toast.makeText(HomeActivity.this, message, Toast.LENGTH_LONG).show();
     }
 
@@ -307,7 +444,7 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
-    public void updateNavHeader(){
+    public void updateNavHeader() {
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
