@@ -58,9 +58,13 @@ import com.matheus.notesapp.Fragments.SettingsFragment;
 import com.matheus.notesapp.Models.Post;
 import com.matheus.notesapp.R;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -208,43 +212,22 @@ public class HomeActivity extends AppCompatActivity
     public void LaunchCamera() {
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        Log.d("LaunchCamera!!!!", "vai criar arquivo") ;
+        Log.d("LaunchCamera!!!!", "vai criar arquivo");
 
         // cria um arquivo para salvar a foto
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
-
-
-
-                String timeStamp = new SimpleDateFormat("yyyyMMdd_Hhmmss",
-                                                        Locale.ENGLISH
-                                                        ).format(new Date());
-                File pasta = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES);
-                String filename = pasta.getPath() + File.separator + "JPG_" + timeStamp + ".jpg";
-                File arquivoFoto = new File(filename);
-            try {
-                arquivoFoto.createNewFile();
-            } catch (IOException ex) {
-
-            }
-
-
-                pickedImgUri = FileProvider.getUriForFile(getBaseContext(),
-                    getBaseContext().getApplicationContext().getPackageName() +
-                            ".provider", arquivoFoto);
-//                pickedImgUri = Uri.fromFile(arquivoFoto);
-                Log.d("pickedImgUri", pickedImgUri.getPath()) ;
+//                Log.d("pickedImgUri", pickedImgUri.getPath()) ;
 
 //                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, pickedImgUri); // todo se eu passo trava e nao da erro
 
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
 
 
     }
 
-    private void openGallery(){
+    private void openGallery() {
         //TODO: open gallery
 
         Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -254,7 +237,7 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        Log.d("onActivityResult ", "entrou") ;
+        Log.d("onActivityResult ", "entrou");
 
         super.onActivityResult(requestCode, resultCode, data);
         Log.d("requestCode", Integer.toString(requestCode));
@@ -268,19 +251,37 @@ public class HomeActivity extends AppCompatActivity
         }
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             popupPostImage.setImageBitmap(imageBitmap);
-            // todo tentar colocar direto a uri
-            sendBroadcast(new Intent(
-                    Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                    pickedImgUri)
-            );
+
+
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_Hhmmss",
+                    Locale.ENGLISH
+            ).format(new Date());
+            File pasta = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES);
+            String filename = pasta.getPath() + File.separator + "JPG_" + timeStamp + ".jpg";
+            File arquivoFoto = new File(filename);
+
+            try {
+                OutputStream os = new BufferedOutputStream(new FileOutputStream(arquivoFoto));
+
+                pickedImgUri = FileProvider.getUriForFile(getBaseContext(),
+                        getBaseContext().getApplicationContext().getPackageName() +
+                                ".provider", arquivoFoto);
+
+                imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                os.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
         }
 
     }
-
 
 
     public void iniPopup() {
@@ -311,9 +312,9 @@ public class HomeActivity extends AppCompatActivity
                 popupClickProgress.setVisibility(View.VISIBLE);
 
                 // we need to test all input fields
-                if(!popupTitle.getText().toString().isEmpty()
-                && !popupDescription.getText().toString().isEmpty()
-                && pickedImgUri != null){
+                if (!popupTitle.getText().toString().isEmpty()
+                        && !popupDescription.getText().toString().isEmpty()
+                        && pickedImgUri != null) {
                     //todo create post object and add it to firebase
 
                     StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("blog_images");
@@ -327,10 +328,10 @@ public class HomeActivity extends AppCompatActivity
                                     String imageDownloadLink = uri.toString();
                                     // create post object
                                     Post post = new Post(popupTitle.getText().toString(),
-                                                         popupDescription.getText().toString(),
-                                                         imageDownloadLink,
-                                                         currentUser.getUid(),
-                                                         currentUser.getPhotoUrl().toString());
+                                            popupDescription.getText().toString(),
+                                            imageDownloadLink,
+                                            currentUser.getUid(),
+                                            currentUser.getPhotoUrl().toString());
                                     // add post to firebase database
                                     addPost(post);
                                 }
