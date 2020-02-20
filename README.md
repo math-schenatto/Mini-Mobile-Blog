@@ -10,7 +10,7 @@
     <li> Tirar foto e selecionar da galeria.</l1>
 
   </ol>
-  
+
 <h3>Componentes</h3>
   <ol>
     <li>Firebase Realtime Database</li>
@@ -18,4 +18,11 @@
     <li>Câmera</li>
   </ol>
 
-<img src="reademe-assets/tela-cadastro.png">
+<h3>Telas</h3>
+
+ <table style="width:100%">
+  <tr>
+    <td>Registro de Usuário</td>
+    <td><img src="reademe-assets/tela-cadastro.png"></td>
+  </tr>
+</table> 
