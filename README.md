@@ -40,4 +40,13 @@
     <td><img src="reademe-assets/my-posts.png"></td>
   </tr>
  
-</table> 
+</table>
+
+  
+    |Registro de Usuário       |<img src="reademe-assets/tela-cadastro.png">|
+    |Login de Usuário          |<img src="reademe-assets/user-login.png">   |
+    |Navigation Drawer Activity|<img src="reademe-assets/navigation.png">   |
+    |Criar um Post             |<img src="reademe-assets/posts.png">        |
+    |Comentários               |<img src="reademe-assets/comments.png">     |
+    |Meus Posts                |<img src="reademe-assets/my-posts.png">     |
+    
