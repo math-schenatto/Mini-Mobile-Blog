@@ -20,9 +20,13 @@
 
 <h3>Telas</h3>
 
- <table border="0" cellspacing="0" rules="none">
+ <table border="1" cellspacing="0" rules="none">
   <tr>
     <td>Registro de Usuário</td>
+    <td><img src="reademe-assets/tela-cadastro.png"></td>
+  </tr>
+  <tr>
+    <td>Login de Usuário</td>
     <td><img src="reademe-assets/tela-cadastro.png"></td>
   </tr>
 </table> 
