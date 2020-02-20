@@ -20,7 +20,7 @@
 
 <h3>Telas</h3>
 
- <table border="1" cellspacing="0" rules="none">
+ <table cellspacing="0" cellpadding="0">
   <tr>
     <td>Registro de Usuário</td>
     <td><img src="reademe-assets/tela-cadastro.png"></td>
@@ -42,11 +42,4 @@
  
 </table>
 
-  
-    |Registro de Usuário       |<img src="reademe-assets/tela-cadastro.png">|
-    |Login de Usuário          |<img src="reademe-assets/user-login.png">   |
-    |Navigation Drawer Activity|<img src="reademe-assets/navigation.png">   |
-    |Criar um Post             |<img src="reademe-assets/posts.png">        |
-    |Comentários               |<img src="reademe-assets/comments.png">     |
-    |Meus Posts                |<img src="reademe-assets/my-posts.png">     |
     
