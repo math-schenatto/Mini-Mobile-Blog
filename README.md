@@ -27,5 +27,11 @@
     <td>Login de Usuário</td>
     <td><img src="reademe-assets/user-login.png"></td>
   </tr>
+  <tr>
+    <td>Navigation Drawer Activity</td>
+    <td><img src="reademe-assets/navigation.png"></td>
+    <td>Criar um Post</td>
+    <td><img src="reademe-assets/posts.png"></td>
+  </tr>
  
 </table> 
