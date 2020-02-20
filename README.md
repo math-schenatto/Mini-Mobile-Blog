@@ -33,5 +33,11 @@
     <td>Criar um Post</td>
     <td><img src="reademe-assets/posts.png"></td>
   </tr>
+  <tr>
+    <td>Comentários</td>
+    <td><img src="reademe-assets/comments.png"></td>
+    <td>Meus Posts</td>
+    <td><img src="reademe-assets/my-posts.png"></td>
+  </tr>
  
 </table> 
