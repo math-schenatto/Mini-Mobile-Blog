@@ -3,12 +3,12 @@
 <h2>Desenvolvimento de um Blog em Android Studio</h2>
 
 <h3>Objetivo</h3>
-<p>
-1. Blog.
-2. Usuários se cadastram e fazem publicações.
-3. Outros usuários podem comentar as publicações.
-4. Tirar foto e selecionar da galeria.
+<ol>
+<li> Blog.</l1>
+<li> Usuários se cadastram e fazem publicações.</l1>
+<li> Outros usuários podem comentar as publicações.</l1>
+<li> Tirar foto e selecionar da galeria.</l1>
 
-</p>
+</ol>
 
 <img src="reademe-assets/tela-cadastro.png">
