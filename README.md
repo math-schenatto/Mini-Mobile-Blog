@@ -1,4 +1,9 @@
 # Mini-Mobile-Blog
+<style>
+table, tr, td {
+    border: none;
+}
+</style>
 
 <h2>Desenvolvimento de um Blog em Android Studio</h2>
 
@@ -20,7 +25,7 @@
 
 <h3>Telas</h3>
 
- <table cellspacing="0" cellpadding="0">
+ <table>
   <tr>
     <td>Registro de Usuário</td>
     <td><img src="reademe-assets/tela-cadastro.png"></td>
