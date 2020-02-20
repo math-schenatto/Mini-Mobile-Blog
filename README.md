@@ -24,9 +24,8 @@
   <tr>
     <td>Registro de Usuário</td>
     <td><img src="reademe-assets/tela-cadastro.png"></td>
-  </tr>
-  <tr>
     <td>Login de Usuário</td>
-    <td><img src="reademe-assets/tela-cadastro.png"></td>
+    <td><img src="reademe-assets/user-login.png"></td>
   </tr>
+ 
 </table> 
