@@ -1,9 +1,4 @@
 # Mini-Mobile-Blog
-<style>
-table, tr, td {
-    border: none;
-}
-</style>
 
 <h2>Desenvolvimento de um Blog em Android Studio</h2>
 
@@ -25,20 +20,20 @@ table, tr, td {
 
 <h3>Telas</h3>
 
- <table>
-  <tr>
+ <table style="border:none;">
+  <tr style="border:none;">
     <td>Registro de Usuário</td>
     <td><img src="reademe-assets/tela-cadastro.png"></td>
     <td>Login de Usuário</td>
     <td><img src="reademe-assets/user-login.png"></td>
   </tr>
-  <tr>
+  <tr style="border:none;">
     <td>Navigation Drawer Activity</td>
     <td><img src="reademe-assets/navigation.png"></td>
     <td>Criar um Post</td>
     <td><img src="reademe-assets/posts.png"></td>
   </tr>
-  <tr>
+  <tr style="border:none;">
     <td>Comentários</td>
     <td><img src="reademe-assets/comments.png"></td>
     <td>Meus Posts</td>
