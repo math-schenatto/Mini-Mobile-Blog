@@ -20,7 +20,7 @@
 
 <h3>Telas</h3>
 
- <table style="width:100%">
+ <table>
   <tr>
     <td>Registro de Usuário</td>
     <td><img src="reademe-assets/tela-cadastro.png"></td>
